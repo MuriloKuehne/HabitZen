@@ -50,7 +50,7 @@ export default async function DashboardPage() {
                   <p className="text-muted-foreground mb-4">
                     Você ainda não tem hábitos criados.
                   </p>
-                  <Link href="/habits/new">
+                  <Link href="/dashboard/habits/new">
                     <Button>
                       <Plus className="mr-2 h-4 w-4" />
                       Criar Primeiro Hábito

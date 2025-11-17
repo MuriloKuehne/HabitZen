@@ -37,9 +37,9 @@ export function Header() {
                 Dashboard
               </Link>
               <Link
-                href="/stats"
+                href="/dashboard/stats"
                 className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === "/stats"
+                  pathname === "/dashboard/stats"
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-accent"
                 }`}
@@ -50,7 +50,7 @@ export function Header() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/habits/new">
+            <Link href="/dashboard/habits/new">
               <Button size="sm" variant="outline" className="hidden sm:flex">
                 <Plus className="mr-2 h-4 w-4" />
                 Novo Hábito
