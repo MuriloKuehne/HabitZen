@@ -10,6 +10,21 @@ interface XPChartProps {
 }
 
 export function XPChart({ data }: XPChartProps) {
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Evolução de XP</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            <p>Nenhum dado disponível ainda. Complete hábitos para ver sua evolução de XP!</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const chartData = data.map((item) => ({
     date: format(new Date(item.date), "dd/MM", { locale: ptBR }),
     xp: item.xp,

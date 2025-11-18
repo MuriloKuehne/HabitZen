@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/habit.types";
 import { subDays } from "date-fns";
 
-export async function getUserStats(): Promise<Profile | null> {
+export async function getUserStats(): Promise<Profile> {
   const supabase = await createClient();
 
   const {
@@ -12,17 +12,80 @@ export async function getUserStats(): Promise<Profile | null> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getUserStats] No authenticated user");
+    }
+    throw new Error("User not authenticated");
   }
 
-  const { data, error } = await supabase
+  // Try to get existing profile
+  let { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("user_id", user.id)
     .single();
 
+  // If profile doesn't exist, create it with defaults
   if (error || !data) {
-    return null;
+    if (process.env.NODE_ENV === "development") {
+      console.log("[getUserStats] Profile not found, creating new profile for user:", user.id);
+      if (error) {
+        console.log("[getUserStats] Error details:", error.message, error.code, error.details);
+      }
+    }
+
+    const defaultProfile = {
+      user_id: user.id,
+      total_xp: 0,
+      current_level: 1,
+      current_streak: 0,
+      longest_streak: 0,
+    };
+
+    // Try to insert the profile
+    const { data: newProfile, error: insertError } = await supabase
+      .from("profiles")
+      .insert(defaultProfile)
+      .select()
+      .single();
+
+    // If insert fails (might be due to RLS or duplicate), try to fetch again
+    // (in case trigger created it or there was a race condition)
+    if (insertError || !newProfile) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[getUserStats] Insert failed, trying to fetch profile again:", insertError);
+      }
+
+      // Try to fetch the profile again (might have been created by trigger)
+      const { data: retryData, error: retryError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (retryData) {
+        return retryData;
+      }
+
+      // If still no profile and error suggests RLS issue, return default
+      if (process.env.NODE_ENV === "development") {
+        console.error("[getUserStats] Failed to create/fetch profile. Insert error:", insertError, "Retry error:", retryError);
+        console.log("[getUserStats] Returning default profile. Make sure migration 002_add_profile_insert_policy.sql is applied.");
+      }
+
+      // Return default profile as fallback
+      return {
+        user_id: user.id,
+        total_xp: 0,
+        current_level: 1,
+        current_streak: 0,
+        longest_streak: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    }
+
+    return newProfile;
   }
 
   return data;
@@ -36,16 +99,26 @@ export async function getXPHistory(days: number = 30) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getXPHistory] No authenticated user");
+    }
     return [];
   }
 
   const startDate = subDays(new Date(), days);
 
   // Get user's habit IDs
-  const { data: userHabits } = await supabase
+  const { data: userHabits, error: habitsError } = await supabase
     .from("habits")
     .select("id")
     .eq("user_id", user.id);
+
+  if (habitsError) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getXPHistory] Error fetching habits:", habitsError);
+    }
+    return [];
+  }
 
   if (!userHabits || userHabits.length === 0) {
     return [];
@@ -60,7 +133,14 @@ export async function getXPHistory(days: number = 30) {
     .gte("completed_at", startDate.toISOString())
     .order("completed_at", { ascending: true });
 
-  if (error || !completions) {
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getXPHistory] Error fetching completions:", error);
+    }
+    return [];
+  }
+
+  if (!completions) {
     return [];
   }
 
@@ -99,14 +179,24 @@ export async function getCompletionStats(startDate: Date, endDate: Date) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getCompletionStats] No authenticated user");
+    }
     return [];
   }
 
   // Get user's habit IDs
-  const { data: userHabits } = await supabase
+  const { data: userHabits, error: habitsError } = await supabase
     .from("habits")
     .select("id, name, type")
     .eq("user_id", user.id);
+
+  if (habitsError) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getCompletionStats] Error fetching habits:", habitsError);
+    }
+    return [];
+  }
 
   if (!userHabits || userHabits.length === 0) {
     return [];
@@ -122,7 +212,14 @@ export async function getCompletionStats(startDate: Date, endDate: Date) {
     .lte("completed_at", endDate.toISOString())
     .order("completed_at", { ascending: true });
 
-  if (error || !completions) {
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[getCompletionStats] Error fetching completions:", error);
+    }
+    return [];
+  }
+
+  if (!completions) {
     return [];
   }
 

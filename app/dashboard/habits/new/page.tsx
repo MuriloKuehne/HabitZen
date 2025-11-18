@@ -9,6 +9,7 @@ export default function NewHabitPage() {
     if (!result?.error) {
       redirect("/dashboard");
     }
+    return result;
   }
 
   return (

@@ -5,7 +5,14 @@ import { LevelProgressBar } from "./LevelProgressBar";
 import { Trophy, Zap } from "lucide-react";
 
 export async function XPDisplay() {
-  const stats = await getUserStats();
+  let stats;
+  
+  try {
+    stats = await getUserStats();
+  } catch (error) {
+    // If getUserStats fails, return null to hide the component
+    return null;
+  }
 
   if (!stats) {
     return null;

@@ -1,6 +1,14 @@
 -- Create enum for habit type
 CREATE TYPE habit_type AS ENUM ('daily', 'weekly');
 
+-- Create immutable function to extract date from timestamp
+CREATE OR REPLACE FUNCTION extract_date_immutable(ts TIMESTAMP WITH TIME ZONE)
+RETURNS DATE AS $$
+BEGIN
+  RETURN (ts AT TIME ZONE 'UTC')::DATE;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 -- Create profiles table (extends auth.users)
 CREATE TABLE IF NOT EXISTS profiles (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -35,15 +43,14 @@ CREATE TABLE IF NOT EXISTS habit_completions (
   habit_id UUID NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
   completed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   xp_earned INTEGER NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  UNIQUE(habit_id, DATE(completed_at))
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id);
 CREATE INDEX IF NOT EXISTS idx_habit_completions_habit_id ON habit_completions(habit_id);
 CREATE INDEX IF NOT EXISTS idx_habit_completions_completed_at ON habit_completions(completed_at);
-CREATE INDEX IF NOT EXISTS idx_habit_completions_habit_date ON habit_completions(habit_id, DATE(completed_at));
+CREATE UNIQUE INDEX IF NOT EXISTS idx_habit_completions_habit_date ON habit_completions(habit_id, extract_date_immutable(completed_at));
 
 -- Function to calculate level from XP
 CREATE OR REPLACE FUNCTION get_level_from_xp(total_xp INTEGER)
@@ -135,7 +142,7 @@ CREATE OR REPLACE FUNCTION calculate_streak(p_user_id UUID)
 RETURNS INTEGER AS $$
 DECLARE
   streak_count INTEGER := 0;
-  current_date DATE := CURRENT_DATE;
+  check_date DATE := CURRENT_DATE;
   has_completion BOOLEAN;
 BEGIN
   LOOP
@@ -145,7 +152,7 @@ BEGIN
       FROM habit_completions hc
       JOIN habits h ON h.id = hc.habit_id
       WHERE h.user_id = p_user_id
-        AND DATE(hc.completed_at) = current_date
+        AND extract_date_immutable(hc.completed_at) = check_date
     ) INTO has_completion;
 
     IF NOT has_completion THEN
@@ -153,7 +160,7 @@ BEGIN
     END IF;
 
     streak_count := streak_count + 1;
-    current_date := current_date - INTERVAL '1 day';
+    check_date := check_date - INTERVAL '1 day';
   END LOOP;
 
   RETURN streak_count;

@@ -84,6 +84,7 @@ export async function createHabit(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    console.error("[createHabit] User not authenticated");
     return {
       error: "Não autenticado",
     };
@@ -96,9 +97,12 @@ export async function createHabit(formData: FormData) {
     color: formData.get("color") as string,
   };
 
+  console.log("[createHabit] Raw form data:", rawFormData);
+
   const validatedFields = habitSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
+    console.error("[createHabit] Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       error: "Dados inválidos",
       details: validatedFields.error.flatten().fieldErrors,
@@ -108,20 +112,41 @@ export async function createHabit(formData: FormData) {
   const { name, description, type, color } = validatedFields.data;
   const xp_value = type === "daily" ? 10 : 50;
 
-  const { error } = await supabase.from("habits").insert({
+  const habitData = {
     user_id: user.id,
     name,
     description: description || null,
     type,
     color,
     xp_value,
-  });
+  };
+
+  console.log("[createHabit] Inserting habit:", { ...habitData, user_id: "[REDACTED]" });
+
+  const { error, data } = await supabase.from("habits").insert(habitData).select();
 
   if (error) {
+    console.error("[createHabit] Database error:", error);
+    
+    // Provide more helpful error messages
+    if (error.code === "42P01" || error.message.includes("does not exist")) {
+      return {
+        error: "Tabela 'habits' não encontrada. Por favor, aplique a migration do banco de dados. Veja o arquivo supabase/migrations/001_initial_schema.sql",
+      };
+    }
+    
+    if (error.code === "42501" || error.message.includes("permission denied")) {
+      return {
+        error: "Permissão negada. Verifique as políticas RLS (Row Level Security) no Supabase.",
+      };
+    }
+    
     return {
       error: error.message,
     };
   }
+
+  console.log("[createHabit] Habit created successfully:", data?.[0]?.id);
 
   revalidatePath("/dashboard");
   revalidatePath("/habits");

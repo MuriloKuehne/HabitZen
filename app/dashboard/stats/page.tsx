@@ -3,22 +3,44 @@ import { XPChart } from "@/components/charts/XPChart";
 import { CompletionChart } from "@/components/charts/CompletionChart";
 import { HabitHeatmap } from "@/components/charts/HabitHeatmap";
 import { StreakCounter } from "@/components/gamification/StreakCounter";
-import { subDays, subMonths } from "date-fns";
+import { subMonths } from "date-fns";
 
 export default async function StatsPage() {
-  const stats = await getUserStats();
-  const xpHistory = await getXPHistory(30);
-  const completionStats = await getCompletionStats(
-    subMonths(new Date(), 1),
-    new Date()
-  );
+  let stats;
+  let xpHistory: { date: string; xp: number; cumulativeXP: number }[] = [];
+  let completionStats: { date: string; count: number; habits: string[] }[] = [];
 
-  if (!stats) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <p>Carregando estatísticas...</p>
-      </div>
+  try {
+    stats = await getUserStats();
+    xpHistory = await getXPHistory(30);
+    completionStats = await getCompletionStats(
+      subMonths(new Date(), 1),
+      new Date()
     );
+  } catch (error) {
+    // If getUserStats fails, create default stats
+    stats = {
+      user_id: "",
+      total_xp: 0,
+      current_level: 1,
+      current_streak: 0,
+      longest_streak: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  // Ensure stats is always defined
+  if (!stats) {
+    stats = {
+      user_id: "",
+      total_xp: 0,
+      current_level: 1,
+      current_streak: 0,
+      longest_streak: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
   }
 
   return (
