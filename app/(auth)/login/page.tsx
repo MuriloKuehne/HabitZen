@@ -6,18 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Github } from "lucide-react";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     setError(null);
-    const result = await signIn(formData);
-    if (result?.error) {
-      setError(result.error);
-    }
+    startTransition(async () => {
+      try {
+        const result = await signIn(formData);
+        if (result?.error) {
+          setError(result.error);
+        }
+      } catch (err) {
+        // NEXT_REDIRECT errors are expected and should be ignored
+        // They indicate a successful redirect - Next.js handles this automatically
+        if (err && typeof err === "object" && "digest" in err) {
+          const nextError = err as { digest?: string };
+          if (nextError.digest?.startsWith("NEXT_REDIRECT")) {
+            // Redirect is happening, ignore the error
+            return;
+          }
+        }
+        // For other errors, show them
+        const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+        setError(errorMessage);
+      }
+    });
   }
 
   return (
@@ -58,9 +76,10 @@ export default function LoginPage() {
             )}
             <Button 
               type="submit" 
+              disabled={isPending}
               className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
-              Sign In
+              {isPending ? "Signing in..." : "Sign In"}
             </Button>
           </form>
           <div className="relative my-6">
@@ -72,7 +91,26 @@ export default function LoginPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <form action={() => signInWithOAuth("google")}>
+            <form action={async () => {
+              startTransition(async () => {
+                try {
+                  const result = await signInWithOAuth("google");
+                  if (result?.error) {
+                    setError(result.error);
+                  }
+                } catch (err) {
+                  // NEXT_REDIRECT errors are expected and should be ignored
+                  if (err && typeof err === "object" && "digest" in err) {
+                    const nextError = err as { digest?: string };
+                    if (nextError.digest?.startsWith("NEXT_REDIRECT")) {
+                      return;
+                    }
+                  }
+                  const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+                  setError(errorMessage);
+                }
+              });
+            }}>
               <Button
                 type="submit"
                 variant="outline"
@@ -99,7 +137,26 @@ export default function LoginPage() {
                 Google
               </Button>
             </form>
-            <form action={() => signInWithOAuth("github")}>
+            <form action={async () => {
+              startTransition(async () => {
+                try {
+                  const result = await signInWithOAuth("github");
+                  if (result?.error) {
+                    setError(result.error);
+                  }
+                } catch (err) {
+                  // NEXT_REDIRECT errors are expected and should be ignored
+                  if (err && typeof err === "object" && "digest" in err) {
+                    const nextError = err as { digest?: string };
+                    if (nextError.digest?.startsWith("NEXT_REDIRECT")) {
+                      return;
+                    }
+                  }
+                  const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+                  setError(errorMessage);
+                }
+              });
+            }}>
               <Button
                 type="submit"
                 variant="outline"
@@ -111,7 +168,7 @@ export default function LoginPage() {
             </form>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-indigo-600 hover:underline dark:text-indigo-400">
               Create account
             </Link>
