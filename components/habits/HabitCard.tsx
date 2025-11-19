@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { completeHabit, uncompleteHabit } from "@/lib/actions/completion-actions";
 import { deleteHabit } from "@/lib/actions/habit-actions";
@@ -34,8 +33,22 @@ export function HabitCard({ habit }: HabitCardProps) {
     });
   };
 
+  const handleWeeklyComplete = () => {
+    startTransition(async () => {
+      await completeHabit(habit.id);
+      router.refresh();
+    });
+  };
+
+  const isWeeklyCompleted = habit.type === "weekly" && habit.weeklyProgress?.isCompleted;
+  const weeklyProgressText = habit.type === "weekly" && habit.weeklyProgress
+    ? isWeeklyCompleted
+      ? "Completed"
+      : `Complete (${habit.weeklyProgress.current}/${habit.weeklyProgress.target})`
+    : null;
+
   const handleDelete = () => {
-    if (confirm("Tem certeza que deseja deletar este hábito?")) {
+    if (confirm("Are you sure you want to delete this habit?")) {
       startTransition(async () => {
         await deleteHabit(habit.id);
         router.refresh();
@@ -82,27 +95,44 @@ export function HabitCard({ habit }: HabitCardProps) {
             className="rounded-full px-2 py-0.5 sm:py-1 text-xs"
             style={{ backgroundColor: `${habit.color}20`, color: habit.color }}
           >
-            {habit.type === "daily" ? "Diário" : "Semanal"}
+            {habit.type === "daily" ? "Daily" : `Weekly (${habit.weekly_frequency || 1}x)`}
           </span>
           <span>+{habit.xp_value} XP</span>
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pt-0">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id={`habit-${habit.id}`}
-            checked={isCompleted}
-            onCheckedChange={handleToggle}
+        {habit.type === "weekly" ? (
+          <div className="space-y-2">
+            <Button
+              onClick={handleWeeklyComplete}
+              disabled={isPending}
+              variant={isWeeklyCompleted ? "secondary" : "default"}
+              className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {weeklyProgressText || "Complete"}
+            </Button>
+            {habit.weeklyProgress && (
+              <div className="w-full bg-muted rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${Math.min((habit.weeklyProgress.current / habit.weeklyProgress.target) * 100, 100)}%`,
+                    backgroundColor: habit.color,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <Button
+            onClick={handleToggle}
             disabled={isPending}
-            className="transition-all duration-200"
-          />
-          <label
-            htmlFor={`habit-${habit.id}`}
-            className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            variant={isCompleted ? "secondary" : "default"}
+            className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            {isCompleted ? "Completo hoje" : "Marcar como completo"}
-          </label>
-        </div>
+            {isCompleted ? "Completed" : "Complete"}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

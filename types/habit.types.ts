@@ -8,6 +8,7 @@ export interface Habit {
   type: HabitType;
   color: string;
   xp_value: number;
+  weekly_frequency: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -33,5 +34,10 @@ export interface Profile {
 export interface HabitWithCompletions extends Habit {
   completions?: HabitCompletion[];
   isCompletedToday?: boolean;
+  weeklyProgress?: {
+    current: number;
+    target: number;
+    isCompleted: boolean;
+  };
 }
 

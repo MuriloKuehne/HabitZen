@@ -11,7 +11,7 @@ export function LevelProgressBar({ progress, className }: LevelProgressBarProps)
   return (
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">Progresso para próximo nível</span>
+        <span className="text-muted-foreground">Progress to next level</span>
         <span className="font-medium">{Math.round(progress)}%</span>
       </div>
       <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">

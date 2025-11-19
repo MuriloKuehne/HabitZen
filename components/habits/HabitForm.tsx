@@ -57,6 +57,7 @@ interface HabitFormProps {
     description: string;
     type: HabitType;
     color: string;
+    weekly_frequency?: number;
   };
   onSubmit: (formData: FormData) => Promise<{ error?: string; details?: Record<string, string[]> } | void>;
   submitLabel?: string;
@@ -78,13 +79,14 @@ const colors = [
 export function HabitForm({
   defaultValues,
   onSubmit,
-  submitLabel = "Criar Hábito",
+  submitLabel = "Create Habit",
   error: initialError,
   errorDetails: initialErrorDetails,
 }: HabitFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>(initialError);
   const [errorDetails, setErrorDetails] = useState<Record<string, string[]> | undefined>(initialErrorDetails);
+  const [habitType, setHabitType] = useState<HabitType>(defaultValues?.type || "daily");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -106,21 +108,21 @@ export function HabitForm({
   return (
     <Card className="animate-in fade-in duration-500">
       <CardHeader className="p-4 sm:p-6">
-        <CardTitle className="text-xl sm:text-2xl">{defaultValues ? "Editar Hábito" : "Novo Hábito"}</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl">{defaultValues ? "Edit Habit" : "New Habit"}</CardTitle>
         <CardDescription className="text-sm">
           {defaultValues
-            ? "Atualize as informações do seu hábito"
-            : "Crie um novo hábito para rastrear"}
+            ? "Update your habit information"
+            : "Create a new habit to track"}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nome do Hábito</Label>
+            <Label htmlFor="name">Habit Name</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ex: Exercitar-se"
+              placeholder="e.g., Exercise"
               required
               defaultValue={defaultValues?.name}
             />
@@ -130,11 +132,11 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição (opcional)</Label>
+            <Label htmlFor="description">Description (optional)</Label>
             <Input
               id="description"
               name="description"
-              placeholder="Ex: Fazer 30 minutos de exercício"
+              placeholder="e.g., Do 30 minutes of exercise"
               defaultValue={defaultValues?.description || ""}
             />
             {errorDetails?.description && (
@@ -143,24 +145,50 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Tipo</Label>
+            <Label htmlFor="type">Type</Label>
             <select
               id="type"
               name="type"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               defaultValue={defaultValues?.type || "daily"}
+              onChange={(e) => setHabitType(e.target.value as HabitType)}
               required
             >
-              <option value="daily">Diário (+10 XP)</option>
-              <option value="weekly">Semanal (+50 XP)</option>
+              <option value="daily">Daily (+10 XP)</option>
+              <option value="weekly">Weekly (+50 XP)</option>
             </select>
             {errorDetails?.type && (
               <p className="text-sm text-red-500">{errorDetails.type.join(", ")}</p>
             )}
           </div>
 
+          {habitType === "weekly" ? (
+            <div className="space-y-2">
+              <Label htmlFor="weekly_frequency">Weekly Frequency</Label>
+              <Input
+                id="weekly_frequency"
+                name="weekly_frequency"
+                type="number"
+                min="1"
+                max="100"
+                placeholder="e.g., 3"
+                required={habitType === "weekly"}
+                defaultValue={defaultValues?.weekly_frequency || 1}
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                How many times do you want to complete this habit per week? (1-100)
+              </p>
+              {errorDetails?.weekly_frequency && (
+                <p className="text-sm text-red-500">{errorDetails.weekly_frequency.join(", ")}</p>
+              )}
+            </div>
+          ) : (
+            <input type="hidden" name="weekly_frequency" value="" />
+          )}
+
           <div className="space-y-2">
-            <Label>Cor</Label>
+            <Label>Color</Label>
             <ColorPicker
               defaultColor={defaultValues?.color || "#3b82f6"}
               colors={colors}
@@ -181,7 +209,7 @@ export function HabitForm({
             className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Salvando..." : submitLabel}
+            {isSubmitting ? "Saving..." : submitLabel}
           </Button>
         </form>
       </CardContent>

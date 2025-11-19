@@ -1,9 +1,8 @@
-import { format, startOfDay, endOfDay, isSameDay, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { format, startOfDay, endOfDay, isSameDay, parseISO, startOfWeek, endOfWeek } from "date-fns";
 
-export function formatDate(date: Date | string, formatStr = "dd/MM/yyyy"): string {
+export function formatDate(date: Date | string, formatStr = "MM/dd/yyyy"): string {
   const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, formatStr, { locale: ptBR });
+  return format(dateObj, formatStr);
 }
 
 export function getStartOfDay(date: Date | string): Date {
@@ -28,5 +27,22 @@ export function getToday(): Date {
 
 export function getTodayString(): string {
   return formatDate(getToday());
+}
+
+export function getWeekStart(date: Date | string): Date {
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
+  return startOfDay(startOfWeek(dateObj, { weekStartsOn: 0 }));
+}
+
+export function getWeekEnd(date: Date | string): Date {
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
+  return endOfDay(endOfWeek(dateObj, { weekStartsOn: 0 }));
+}
+
+export function getWeekRange(date: Date | string): { start: Date; end: Date } {
+  return {
+    start: getWeekStart(date),
+    end: getWeekEnd(date),
+  };
 }
 

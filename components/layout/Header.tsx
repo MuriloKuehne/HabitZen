@@ -29,7 +29,7 @@ export function Header() {
     },
     {
       href: "/dashboard/stats",
-      label: "Estatísticas",
+      label: "Stats",
       icon: BarChart3,
       active: pathname === "/dashboard/stats",
     },
@@ -52,7 +52,7 @@ export function Header() {
                     href={link.href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                       link.active
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-accent text-accent-foreground border border-border"
                         : "hover:bg-accent"
                     }`}
                   >
@@ -68,7 +68,7 @@ export function Header() {
             <Link href="/dashboard/habits/new">
               <Button size="sm" variant="outline" className="hidden sm:flex transition-all duration-200 hover:scale-105">
                 <Plus className="mr-2 h-4 w-4" />
-                Novo Hábito
+                New Habit
               </Button>
             </Link>
             <Button
@@ -78,7 +78,7 @@ export function Header() {
               className="transition-all duration-200 hover:scale-105"
             >
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline ml-2">Sair</span>
+              <span className="hidden sm:inline ml-2">Sign Out</span>
             </Button>
             <Button
               size="icon"
@@ -105,7 +105,7 @@ export function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
                     link.active
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-accent text-accent-foreground border border-border"
                       : "hover:bg-accent"
                   }`}
                 >
@@ -127,7 +127,7 @@ export function Header() {
               className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent mt-4 text-left"
             >
               <LogOut className="h-5 w-5" />
-              Sair
+              Sign Out
             </button>
           </nav>
         </SheetContent>

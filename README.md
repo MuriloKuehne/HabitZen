@@ -74,6 +74,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_aqui
 
    - Acesse o SQL Editor no painel do Supabase
    - Execute o SQL do arquivo `supabase/migrations/001_initial_schema.sql`
+   - Execute o SQL do arquivo `supabase/migrations/002_add_weekly_frequency.sql`
    - Isso criará todas as tabelas, funções e triggers necessários
 
 5. **Execute o projeto**

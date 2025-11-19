@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -61,14 +60,14 @@ export function HabitCalendar({ habitId }: HabitCalendarProps) {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
     <Card className="animate-in fade-in duration-500">
       <CardHeader className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base sm:text-lg">
-            {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+            {format(currentMonth, "MMMM yyyy")}
           </CardTitle>
           <div className="flex gap-1 sm:gap-2">
             <Button 

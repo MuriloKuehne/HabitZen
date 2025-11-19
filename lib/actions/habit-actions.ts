@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { habitSchema } from "@/lib/utils/validations";
 import type { Habit, HabitWithCompletions } from "@/types/habit.types";
-import { getStartOfDay, getEndOfDay } from "@/lib/utils/date-helpers";
+import { getStartOfDay, getEndOfDay, getWeekStart, getWeekEnd } from "@/lib/utils/date-helpers";
 
 export async function getHabits(): Promise<HabitWithCompletions[]> {
   const supabase = await createClient();
@@ -45,10 +45,78 @@ export async function getHabits(): Promise<HabitWithCompletions[]> {
     completions?.map((c) => [c.habit_id, c]) || []
   );
 
-  return habits.map((habit) => ({
-    ...habit,
-    isCompletedToday: completionMap.has(habit.id),
-  }));
+  // Get weekly completions for weekly habits
+  const weeklyHabits = habits.filter((h) => h.type === "weekly");
+  const weekStart = getWeekStart(new Date());
+  const weekEnd = getWeekEnd(new Date());
+
+  let weeklyCompletions: { habit_id: string; count: number }[] = [];
+  if (weeklyHabits.length > 0) {
+    const { data: weekCompletions } = await supabase
+      .from("habit_completions")
+      .select("habit_id")
+      .in(
+        "habit_id",
+        weeklyHabits.map((h) => h.id)
+      )
+      .gte("completed_at", weekStart.toISOString())
+      .lte("completed_at", weekEnd.toISOString());
+
+    const weeklyCountMap = new Map<string, number>();
+    weekCompletions?.forEach((c) => {
+      weeklyCountMap.set(c.habit_id, (weeklyCountMap.get(c.habit_id) || 0) + 1);
+    });
+
+    weeklyCompletions = Array.from(weeklyCountMap.entries()).map(([habit_id, count]) => ({
+      habit_id,
+      count,
+    }));
+  }
+
+  const weeklyProgressMap = new Map(
+    weeklyCompletions.map((wc) => [
+      wc.habit_id,
+      {
+        current: wc.count,
+        target: habits.find((h) => h.id === wc.habit_id)?.weekly_frequency || 1,
+        isCompleted: false,
+      },
+    ])
+  );
+
+  // Update weekly progress map with all weekly habits (including those with 0 completions)
+  weeklyHabits.forEach((habit) => {
+    if (!weeklyProgressMap.has(habit.id)) {
+      weeklyProgressMap.set(habit.id, {
+        current: 0,
+        target: habit.weekly_frequency || 1,
+        isCompleted: false,
+      });
+    }
+    const progress = weeklyProgressMap.get(habit.id)!;
+    progress.isCompleted = progress.current >= progress.target;
+  });
+
+  return habits.map((habit) => {
+    const baseHabit = {
+      ...habit,
+      isCompletedToday: completionMap.has(habit.id),
+    };
+
+    if (habit.type === "weekly") {
+      const progress = weeklyProgressMap.get(habit.id);
+      return {
+        ...baseHabit,
+        weeklyProgress: progress || {
+          current: 0,
+          target: habit.weekly_frequency || 1,
+          isCompleted: false,
+        },
+      };
+    }
+
+    return baseHabit;
+  });
 }
 
 export async function getHabit(id: string): Promise<Habit | null> {
@@ -86,15 +154,20 @@ export async function createHabit(formData: FormData) {
   if (!user) {
     console.error("[createHabit] User not authenticated");
     return {
-      error: "Não autenticado",
+      error: "Not authenticated",
     };
   }
 
+  const weeklyFrequencyValue = formData.get("weekly_frequency");
+  const habitType = formData.get("type") as "daily" | "weekly";
   const rawFormData = {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
-    type: formData.get("type") as "daily" | "weekly",
+    type: habitType,
     color: formData.get("color") as string,
+    weekly_frequency: habitType === "weekly" && weeklyFrequencyValue && weeklyFrequencyValue !== "" 
+      ? parseInt(weeklyFrequencyValue as string, 10) 
+      : undefined,
   };
 
   console.log("[createHabit] Raw form data:", rawFormData);
@@ -104,12 +177,12 @@ export async function createHabit(formData: FormData) {
   if (!validatedFields.success) {
     console.error("[createHabit] Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
-      error: "Dados inválidos",
+      error: "Invalid data",
       details: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  const { name, description, type, color } = validatedFields.data;
+  const { name, description, type, color, weekly_frequency } = validatedFields.data;
   const xp_value = type === "daily" ? 10 : 50;
 
   const habitData = {
@@ -119,6 +192,7 @@ export async function createHabit(formData: FormData) {
     type,
     color,
     xp_value,
+    weekly_frequency: type === "weekly" ? (weekly_frequency ?? 1) : null,
   };
 
   console.log("[createHabit] Inserting habit:", { ...habitData, user_id: "[REDACTED]" });
@@ -131,13 +205,19 @@ export async function createHabit(formData: FormData) {
     // Provide more helpful error messages
     if (error.code === "42P01" || error.message.includes("does not exist")) {
       return {
-        error: "Tabela 'habits' não encontrada. Por favor, aplique a migration do banco de dados. Veja o arquivo supabase/migrations/001_initial_schema.sql",
+        error: "Habits table not found. Please apply the database migration. See the file supabase/migrations/001_initial_schema.sql",
+      };
+    }
+    
+    if (error.code === "PGRST204" || error.message.includes("Could not find") || error.message.includes("column") && error.message.includes("schema cache")) {
+      return {
+        error: "Database schema is out of date. Please apply the migration '002_add_weekly_frequency.sql' in the Supabase SQL Editor. The weekly_frequency column is missing from the habits table.",
       };
     }
     
     if (error.code === "42501" || error.message.includes("permission denied")) {
       return {
-        error: "Permissão negada. Verifique as políticas RLS (Row Level Security) no Supabase.",
+        error: "Permission denied. Please check RLS (Row Level Security) policies in Supabase.",
       };
     }
     
@@ -150,6 +230,8 @@ export async function createHabit(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/habits");
+  
+  return { success: true };
 }
 
 export async function updateHabit(id: string, formData: FormData) {
@@ -161,43 +243,64 @@ export async function updateHabit(id: string, formData: FormData) {
 
   if (!user) {
     return {
-      error: "Não autenticado",
+      error: "Not authenticated",
     };
   }
 
+  const weeklyFrequencyValue = formData.get("weekly_frequency");
   const rawFormData = {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     type: formData.get("type") as "daily" | "weekly",
     color: formData.get("color") as string,
+    weekly_frequency: weeklyFrequencyValue ? parseInt(weeklyFrequencyValue as string, 10) : undefined,
   };
 
   const validatedFields = habitSchema.safeParse(rawFormData);
 
   if (!validatedFields.success) {
     return {
-      error: "Dados inválidos",
+      error: "Invalid data",
       details: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  const { name, description, type, color } = validatedFields.data;
+  const { name, description, type, color, weekly_frequency } = validatedFields.data;
   const xp_value = type === "daily" ? 10 : 50;
+
+  const updateData: {
+    name: string;
+    description: string | null;
+    type: "daily" | "weekly";
+    color: string;
+    xp_value: number;
+    weekly_frequency: number | null;
+    updated_at: string;
+  } = {
+    name,
+    description: description || null,
+    type,
+    color,
+    xp_value,
+    weekly_frequency: type === "weekly" ? (weekly_frequency ?? 1) : null,
+    updated_at: new Date().toISOString(),
+  };
 
   const { error } = await supabase
     .from("habits")
-    .update({
-      name,
-      description: description || null,
-      type,
-      color,
-      xp_value,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq("id", id)
     .eq("user_id", user.id);
 
   if (error) {
+    console.error("[updateHabit] Database error:", error);
+    
+    if (error.code === "PGRST204" || error.message.includes("Could not find") || error.message.includes("column") && error.message.includes("schema cache")) {
+      return {
+        error: "Database schema is out of date. Please apply the migration '002_add_weekly_frequency.sql' in the Supabase SQL Editor. The weekly_frequency column is missing from the habits table.",
+      };
+    }
+    
     return {
       error: error.message,
     };
@@ -205,6 +308,8 @@ export async function updateHabit(id: string, formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/habits");
+  
+  return { success: true };
 }
 
 export async function deleteHabit(id: string) {
@@ -216,7 +321,7 @@ export async function deleteHabit(id: string) {
 
   if (!user) {
     return {
-      error: "Não autenticado",
+      error: "Not authenticated",
     };
   }
 

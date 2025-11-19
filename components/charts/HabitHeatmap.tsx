@@ -65,11 +65,11 @@ export function HabitHeatmap({ habitId }: HabitHeatmapProps) {
   return (
     <Card className="animate-in fade-in duration-500">
       <CardHeader className="p-4 sm:p-6">
-        <CardTitle className="text-lg sm:text-xl">Heatmap de Atividade</CardTitle>
+        <CardTitle className="text-base sm:text-lg md:text-xl">Activity Heatmap</CardTitle>
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pt-0">
-        <div className="overflow-x-auto">
-          <div className="flex gap-1">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <div className="flex gap-1 min-w-fit">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-1">
                 {week.map((day) => {
@@ -97,15 +97,15 @@ export function HabitHeatmap({ habitId }: HabitHeatmapProps) {
             ))}
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-          <span>Menos</span>
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-muted-foreground">
+          <span>Less</span>
           <div className="flex gap-1">
             <div className="w-3 h-3 rounded bg-muted" />
             <div className="w-3 h-3 rounded bg-indigo-200" />
             <div className="w-3 h-3 rounded bg-indigo-400" />
             <div className="w-3 h-3 rounded bg-indigo-600" />
           </div>
-          <span>Mais</span>
+          <span>More</span>
         </div>
       </CardContent>
     </Card>

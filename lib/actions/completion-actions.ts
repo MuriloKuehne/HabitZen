@@ -14,21 +14,21 @@ export async function completeHabit(habitId: string, date?: Date) {
 
   if (!user) {
     return {
-      error: "Não autenticado",
+      error: "Not authenticated",
     };
   }
 
-  // Verify habit belongs to user
+  // Verify habit belongs to user and get habit type
   const { data: habit } = await supabase
     .from("habits")
-    .select("id")
+    .select("id, type")
     .eq("id", habitId)
     .eq("user_id", user.id)
     .single();
 
   if (!habit) {
     return {
-      error: "Hábito não encontrado",
+      error: "Habit not found",
     };
   }
 
@@ -36,19 +36,22 @@ export async function completeHabit(habitId: string, date?: Date) {
   const dayStart = getStartOfDay(targetDate);
   const dayEnd = getEndOfDay(targetDate);
 
-  // Check if already completed today
-  const { data: existing } = await supabase
-    .from("habit_completions")
-    .select("id")
-    .eq("habit_id", habitId)
-    .gte("completed_at", dayStart.toISOString())
-    .lte("completed_at", dayEnd.toISOString())
-    .single();
+  // Only check for duplicate completions for daily habits
+  // Weekly habits can be completed multiple times per day
+  if (habit.type === "daily") {
+    const { data: existing } = await supabase
+      .from("habit_completions")
+      .select("id")
+      .eq("habit_id", habitId)
+      .gte("completed_at", dayStart.toISOString())
+      .lte("completed_at", dayEnd.toISOString())
+      .single();
 
-  if (existing) {
-    return {
-      error: "Hábito já completado hoje",
-    };
+    if (existing) {
+      return {
+        error: "Habit already completed today",
+      };
+    }
   }
 
   const { error } = await supabase.from("habit_completions").insert({
@@ -76,7 +79,7 @@ export async function uncompleteHabit(habitId: string, date?: Date) {
 
   if (!user) {
     return {
-      error: "Não autenticado",
+      error: "Not authenticated",
     };
   }
 
@@ -90,7 +93,7 @@ export async function uncompleteHabit(habitId: string, date?: Date) {
 
   if (!habit) {
     return {
-      error: "Hábito não encontrado",
+      error: "Habit not found",
     };
   }
 
