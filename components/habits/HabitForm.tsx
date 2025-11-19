@@ -17,14 +17,14 @@ function ColorPicker({
   const [selectedColor, setSelectedColor] = useState(defaultColor);
 
   return (
-    <div className="flex gap-2 flex-wrap">
+    <div className="flex gap-2 sm:gap-3 flex-wrap">
       {colors.map((color) => (
         <label
           key={color}
-          className="cursor-pointer"
+          className="cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
           style={{
-            width: "40px",
-            height: "40px",
+            width: "36px",
+            height: "36px",
             borderRadius: "8px",
             backgroundColor: color,
             display: "flex",
@@ -32,7 +32,7 @@ function ColorPicker({
             justifyContent: "center",
             border:
               selectedColor === color
-                ? "3px solid #000"
+                ? "3px solid hsl(var(--foreground))"
                 : "3px solid transparent",
           }}
         >
@@ -104,16 +104,16 @@ export function HabitForm({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{defaultValues ? "Editar Hábito" : "Novo Hábito"}</CardTitle>
-        <CardDescription>
+    <Card className="animate-in fade-in duration-500">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-xl sm:text-2xl">{defaultValues ? "Editar Hábito" : "Novo Hábito"}</CardTitle>
+        <CardDescription className="text-sm">
           {defaultValues
             ? "Atualize as informações do seu hábito"
             : "Crie um novo hábito para rastrear"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nome do Hábito</Label>
@@ -176,7 +176,11 @@ export function HabitForm({
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Salvando..." : submitLabel}
           </Button>
         </form>

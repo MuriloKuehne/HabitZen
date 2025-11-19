@@ -16,7 +16,7 @@ export function LevelProgressBar({ progress, className }: LevelProgressBarProps)
       </div>
       <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
         <div
-          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-700 ease-out animate-in slide-in-from-left"
           style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
         />
       </div>

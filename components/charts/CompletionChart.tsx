@@ -31,12 +31,12 @@ export function CompletionChart({ data }: CompletionChartProps) {
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Hábitos Completados por Dia</CardTitle>
+    <Card className="animate-in fade-in duration-500">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">Hábitos Completados por Dia</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="p-4 sm:p-6 pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />

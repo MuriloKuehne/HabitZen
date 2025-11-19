@@ -39,7 +39,7 @@ export function HabitHeatmap({ habitId }: HabitHeatmapProps) {
   const yearEnd = endOfYear(new Date());
   const daysInYear = eachDayOfInterval({ start: yearStart, end: yearEnd });
 
-  const getIntensity = (date: Date) => {
+  const getIntensity = (date: Date): 0 | 1 | 2 | 3 | 4 => {
     const isCompleted = completions.some((completion) =>
       isSameDay(new Date(completion.completed_at), date)
     );
@@ -63,11 +63,11 @@ export function HabitHeatmap({ habitId }: HabitHeatmapProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Heatmap de Atividade</CardTitle>
+    <Card className="animate-in fade-in duration-500">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">Heatmap de Atividade</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         <div className="overflow-x-auto">
           <div className="flex gap-1">
             {weeks.map((week, weekIndex) => (

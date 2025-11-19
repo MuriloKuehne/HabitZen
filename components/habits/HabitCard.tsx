@@ -45,18 +45,22 @@ export function HabitCard({ habit }: HabitCardProps) {
 
   return (
     <Card
-      className="relative"
+      className="relative transition-all duration-300 hover:shadow-lg hover:scale-[1.02] animate-in fade-in slide-in-from-bottom-4"
       style={{
         borderLeft: `4px solid ${habit.color}`,
       }}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg">{habit.name}</CardTitle>
-          <div className="flex gap-2">
-            <Link href={`/habits/${habit.id}`}>
-              <Button variant="ghost" size="icon">
-                <Edit className="h-4 w-4" />
+      <CardHeader className="pb-3 p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-base sm:text-lg flex-1">{habit.name}</CardTitle>
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+            <Link href={`/dashboard/habits/${habit.id}`}>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-8 w-8 sm:h-10 sm:w-10 transition-all duration-200 hover:scale-110"
+              >
+                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </Link>
             <Button
@@ -64,17 +68,18 @@ export function HabitCard({ habit }: HabitCardProps) {
               size="icon"
               onClick={handleDelete}
               disabled={isPending}
+              className="h-8 w-8 sm:h-10 sm:w-10 transition-all duration-200 hover:scale-110"
             >
-              <Trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive" />
             </Button>
           </div>
         </div>
         {habit.description && (
-          <p className="text-sm text-muted-foreground">{habit.description}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">{habit.description}</p>
         )}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2 flex-wrap">
           <span
-            className="rounded-full px-2 py-1"
+            className="rounded-full px-2 py-0.5 sm:py-1 text-xs"
             style={{ backgroundColor: `${habit.color}20`, color: habit.color }}
           >
             {habit.type === "daily" ? "Diário" : "Semanal"}
@@ -82,17 +87,18 @@ export function HabitCard({ habit }: HabitCardProps) {
           <span>+{habit.xp_value} XP</span>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         <div className="flex items-center gap-2">
           <Checkbox
             id={`habit-${habit.id}`}
             checked={isCompleted}
             onCheckedChange={handleToggle}
             disabled={isPending}
+            className="transition-all duration-200"
           />
           <label
             htmlFor={`habit-${habit.id}`}
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
           >
             {isCompleted ? "Completo hoje" : "Marcar como completo"}
           </label>

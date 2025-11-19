@@ -7,13 +7,10 @@ export interface CheckboxProps
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, onCheckedChange, onChange, ...props }, ref) => {
+  ({ className, onCheckedChange, ...props }, ref) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (onCheckedChange) {
         onCheckedChange(e.target.checked);
-      }
-      if (onChange) {
-        onChange(e);
       }
     };
 
@@ -21,7 +18,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       <input
         type="checkbox"
         className={cn(
-          "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500",
+          "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-all duration-200 cursor-pointer",
           className
         )}
         ref={ref}

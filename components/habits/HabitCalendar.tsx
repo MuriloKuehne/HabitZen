@@ -64,28 +64,38 @@ export function HabitCalendar({ habitId }: HabitCalendarProps) {
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>
+    <Card className="animate-in fade-in duration-500">
+      <CardHeader className="p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base sm:text-lg">
             {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
           </CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={previousMonth}>
-              <ChevronLeft className="h-4 w-4" />
+          <div className="flex gap-1 sm:gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={previousMonth}
+              className="h-8 w-8 sm:h-10 sm:w-10 transition-all duration-200 hover:scale-110"
+            >
+              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button variant="outline" size="icon" onClick={nextMonth}>
-              <ChevronRight className="h-4 w-4" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={nextMonth}
+              className="h-8 w-8 sm:h-10 sm:w-10 transition-all duration-200 hover:scale-110"
+            >
+              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         <div className="grid grid-cols-7 gap-1">
           {weekDays.map((day) => (
             <div
               key={day}
-              className="text-center text-sm font-medium text-muted-foreground p-2"
+              className="text-center text-xs sm:text-sm font-medium text-muted-foreground p-1 sm:p-2"
             >
               {day}
             </div>
@@ -100,7 +110,7 @@ export function HabitCalendar({ habitId }: HabitCalendarProps) {
             return (
               <div
                 key={day.toISOString()}
-                className={`aspect-square flex items-center justify-center rounded-md text-sm ${
+                className={`aspect-square flex items-center justify-center rounded-md text-xs sm:text-sm transition-all duration-200 hover:scale-110 ${
                   completed
                     ? "bg-indigo-500 text-white font-semibold"
                     : "bg-muted hover:bg-muted/80"

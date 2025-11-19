@@ -32,11 +32,15 @@ export default async function EditHabitPage({ params }: EditHabitPageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Editar Hábito</h1>
+    <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-2xl">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-500">
+        <h1 className="text-2xl sm:text-3xl font-bold">Editar Hábito</h1>
         <form action={handleDelete}>
-          <Button type="submit" variant="destructive">
+          <Button 
+            type="submit" 
+            variant="destructive"
+            className="transition-all duration-200 hover:scale-105 active:scale-95"
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Deletar
           </Button>

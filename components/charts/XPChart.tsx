@@ -32,12 +32,12 @@ export function XPChart({ data }: XPChartProps) {
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Evolução de XP</CardTitle>
+    <Card className="animate-in fade-in duration-500">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-lg sm:text-xl">Evolução de XP</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+      <CardContent className="p-4 sm:p-6 pt-0">
+        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />

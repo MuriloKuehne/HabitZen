@@ -44,20 +44,28 @@ export default async function StatsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Estatísticas</h1>
+    <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 animate-in fade-in duration-500">Estatísticas</h1>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <StreakCounter
-          currentStreak={stats.current_streak}
-          longestStreak={stats.longest_streak}
-        />
+      <div className="grid gap-6 sm:grid-cols-2 mb-6 sm:mb-8">
+        <div className="animate-in fade-in duration-500 delay-100">
+          <StreakCounter
+            currentStreak={stats.current_streak}
+            longestStreak={stats.longest_streak}
+          />
+        </div>
       </div>
 
       <div className="mt-6 space-y-6">
-        <XPChart data={xpHistory} />
-        <CompletionChart data={completionStats} />
-        <HabitHeatmap />
+        <div className="animate-in fade-in duration-500 delay-200">
+          <XPChart data={xpHistory} />
+        </div>
+        <div className="animate-in fade-in duration-500 delay-300">
+          <CompletionChart data={completionStats} />
+        </div>
+        <div className="animate-in fade-in duration-500 delay-400">
+          <HabitHeatmap />
+        </div>
       </div>
     </div>
   );
