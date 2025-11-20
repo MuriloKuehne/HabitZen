@@ -76,7 +76,24 @@ export default function RegisterPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <form action={() => signInWithOAuth("google")}>
+            <form action={async () => {
+              try {
+                const result = await signInWithOAuth("google");
+                if (result?.error) {
+                  setError(result.error);
+                }
+              } catch (err) {
+                // NEXT_REDIRECT errors are expected and should be ignored
+                if (err && typeof err === "object" && "digest" in err) {
+                  const nextError = err as { digest?: string };
+                  if (nextError.digest?.startsWith("NEXT_REDIRECT")) {
+                    return;
+                  }
+                }
+                const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+                setError(errorMessage);
+              }
+            }}>
               <Button
                 type="submit"
                 variant="outline"
@@ -103,7 +120,24 @@ export default function RegisterPage() {
                 Google
               </Button>
             </form>
-            <form action={() => signInWithOAuth("github")}>
+            <form action={async () => {
+              try {
+                const result = await signInWithOAuth("github");
+                if (result?.error) {
+                  setError(result.error);
+                }
+              } catch (err) {
+                // NEXT_REDIRECT errors are expected and should be ignored
+                if (err && typeof err === "object" && "digest" in err) {
+                  const nextError = err as { digest?: string };
+                  if (nextError.digest?.startsWith("NEXT_REDIRECT")) {
+                    return;
+                  }
+                }
+                const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
+                setError(errorMessage);
+              }
+            }}>
               <Button
                 type="submit"
                 variant="outline"
