@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "Create a new habit to track and build your routine",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function NewHabitPage() {
   async function handleSubmit(formData: FormData) {
     "use server";

@@ -5,6 +5,20 @@ function validateEnvVariables() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // During build time, environment variables may not be available
+  // Return placeholder values - validation will happen at runtime
+  const isBuildTime = process.env.NEXT_PHASE === "phase-production-build" || 
+                      process.env.NODE_ENV === "production" && !supabaseUrl;
+
+  if (isBuildTime && (!supabaseUrl || !supabaseAnonKey)) {
+    // During build, return placeholder values
+    // These will be validated properly at runtime
+    return {
+      supabaseUrl: supabaseUrl || "https://placeholder.supabase.co",
+      supabaseAnonKey: supabaseAnonKey || "placeholder-key",
+    };
+  }
+
   if (!supabaseUrl) {
     throw new Error(
       "Missing NEXT_PUBLIC_SUPABASE_URL environment variable. Please set it in your environment configuration."
