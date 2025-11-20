@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { XPDisplay } from "@/components/gamification/XPDisplay";
 import { HabitCalendar } from "@/components/habits/HabitCalendar";
 import type { Metadata } from "next";
+import type { HabitWithCompletions } from "@/types/habit.types";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
       redirect("/login");
     }
 
-    let habits;
+    let habits: HabitWithCompletions[];
     try {
       habits = await getHabits();
     } catch (error) {
@@ -65,7 +66,7 @@ export default async function DashboardPage() {
                 ) : (
                   <div className="rounded-lg border border-dashed p-8 sm:p-12 text-center">
                     <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                      You don't have any habits created yet.
+                      You don&#39;t have any habits created yet.
                     </p>
                     <Link href="/dashboard/habits/new">
                       <Button className="transition-all duration-200 hover:scale-105">
