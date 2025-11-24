@@ -16,6 +16,7 @@ const navLinks = [
 
 const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
   e.preventDefault();
+  if (typeof window === "undefined" || typeof document === "undefined") return;
   const element = document.querySelector(href);
   if (element) {
     element.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -27,9 +28,15 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+    
+    // Set initial scroll state
+    handleScroll();
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -49,7 +56,9 @@ export function LandingHeader() {
             className="text-xl font-bold transition-opacity hover:opacity-80"
             onClick={(e) => {
               e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              if (typeof window !== "undefined") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
             }}
           >
             HabitZen
