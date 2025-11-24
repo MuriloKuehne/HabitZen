@@ -103,13 +103,13 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 touch-manipulation min-h-[44px] ${
                     link.active
                       ? "bg-accent text-accent-foreground border border-border"
-                      : "hover:bg-accent"
+                      : "hover:bg-accent active:bg-accent/80"
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 shrink-0" />
                   {link.label}
                 </Link>
               );
@@ -117,16 +117,20 @@ export function Header() {
             <Link
               href="/dashboard/habits/new"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent mt-4"
+              className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent active:bg-accent/80 mt-4 touch-manipulation min-h-[44px]"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-5 w-5 shrink-0" />
               Novo Hábito
             </Link>
+            <div className="border-t my-2" />
+            <div className="px-4 py-2">
+              <ThemeToggle />
+            </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent mt-4 text-left"
+              className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all duration-200 hover:bg-accent active:bg-accent/80 mt-2 text-left touch-manipulation min-h-[44px] w-full"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-5 w-5 shrink-0" />
               Sign Out
             </button>
           </nav>
