@@ -111,7 +111,7 @@ export default async function Home() {
                 Ready to transform your habits?
               </h2>
               <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
-                Join HabitZen today and start your journey towards a better you. It's free to get started.
+                Join HabitZen today and start your journey towards a better you. It&apos;s free to get started.
               </p>
               <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
