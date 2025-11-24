@@ -87,7 +87,7 @@ export function LandingHeader() {
               size="icon"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
-              className="h-9 w-9"
+              className="h-11 w-11 touch-manipulation"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -98,7 +98,7 @@ export function LandingHeader() {
       {/* Mobile Menu Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent onClose={() => setMobileMenuOpen(false)}>
-          <nav className="flex flex-col gap-4 mt-4">
+          <nav className="flex flex-col gap-2 mt-2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -107,11 +107,15 @@ export function LandingHeader() {
                   handleSmoothScroll(e, link.href);
                   setMobileMenuOpen(false);
                 }}
-                className="text-base font-medium text-foreground py-2 px-4 rounded-md hover:bg-accent transition-colors"
+                className="text-base font-medium text-foreground py-3 px-4 rounded-md hover:bg-accent active:bg-accent/80 transition-colors touch-manipulation min-h-[44px] flex items-center"
               >
                 {link.label}
               </a>
             ))}
+            <div className="border-t my-2" />
+            <div className="px-4 py-2">
+              <ThemeToggle />
+            </div>
           </nav>
         </SheetContent>
       </Sheet>

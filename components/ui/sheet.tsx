@@ -42,7 +42,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
       />
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-background border-l shadow-lg transform transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 right-0 z-50 w-full sm:max-w-sm bg-background border-l shadow-lg transform transition-transform duration-300 ease-in-out",
           open ? "translate-x-0" : "translate-x-full"
         )}
         role="dialog"
@@ -67,17 +67,17 @@ export function SheetContent({
 }: SheetContentProps) {
   return (
     <div className={cn("flex flex-col h-full", className)} {...props}>
-      <div className="flex items-center justify-between p-4 border-b shrink-0">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b shrink-0">
         <h2 className="text-lg font-semibold">Menu</h2>
         <button
           onClick={onClose}
-          className="rounded-md p-2 hover:bg-accent transition-colors touch-manipulation"
+          className="rounded-md p-2 hover:bg-accent transition-colors touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Close menu"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>
+      <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
     </div>
   );
 }
