@@ -23,24 +23,24 @@ export async function XPDisplay() {
 
   return (
     <Card className="animate-in fade-in duration-500">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
           <Trophy className="h-5 w-5 text-yellow-500 animate-pulse" />
           Progress
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
+      <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div className="animate-in slide-in-from-left duration-500">
-            <p className="text-2xl font-bold">Level {level}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xl sm:text-2xl font-bold">Level {level}</p>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               {stats.total_xp} total XP
             </p>
           </div>
           <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 animate-in slide-in-from-right duration-500">
             <Zap className="h-5 w-5" />
-            <span className="text-lg font-semibold">{stats.current_streak}</span>
-            <span className="text-sm text-muted-foreground">days</span>
+            <span className="text-base sm:text-lg font-semibold">{stats.current_streak}</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">days</span>
           </div>
         </div>
         <LevelProgressBar progress={progress} />

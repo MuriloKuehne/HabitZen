@@ -21,10 +21,12 @@ function ColorPicker({
       {colors.map((color) => (
         <label
           key={color}
-          className="cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95"
+          className="cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 touch-manipulation"
           style={{
-            width: "36px",
-            height: "36px",
+            width: "44px",
+            height: "44px",
+            minWidth: "44px",
+            minHeight: "44px",
             borderRadius: "8px",
             backgroundColor: color,
             display: "flex",
@@ -118,13 +120,15 @@ export function HabitForm({
       <CardContent className="p-4 sm:p-6 pt-0">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Habit Name</Label>
+            <Label htmlFor="name" className="text-base sm:text-sm">Habit Name</Label>
             <Input
               id="name"
               name="name"
+              type="text"
               placeholder="e.g., Exercise"
               required
               defaultValue={defaultValues?.name}
+              autoComplete="off"
             />
             {errorDetails?.name && (
               <p className="text-sm text-red-500">{errorDetails.name.join(", ")}</p>
@@ -132,12 +136,14 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description (optional)</Label>
+            <Label htmlFor="description" className="text-base sm:text-sm">Description (optional)</Label>
             <Input
               id="description"
               name="description"
+              type="text"
               placeholder="e.g., Do 30 minutes of exercise"
               defaultValue={defaultValues?.description || ""}
+              autoComplete="off"
             />
             {errorDetails?.description && (
               <p className="text-sm text-red-500">{errorDetails.description.join(", ")}</p>
@@ -145,11 +151,11 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
+            <Label htmlFor="type" className="text-base sm:text-sm">Type</Label>
             <select
               id="type"
               name="type"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base sm:text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[44px] touch-manipulation"
               defaultValue={defaultValues?.type || "daily"}
               onChange={(e) => setHabitType(e.target.value as HabitType)}
               required
@@ -164,11 +170,12 @@ export function HabitForm({
 
           {habitType === "weekly" ? (
             <div className="space-y-2">
-              <Label htmlFor="weekly_frequency">Weekly Frequency</Label>
+              <Label htmlFor="weekly_frequency" className="text-base sm:text-sm">Weekly Frequency</Label>
               <Input
                 id="weekly_frequency"
                 name="weekly_frequency"
                 type="number"
+                inputMode="numeric"
                 min="1"
                 max="100"
                 placeholder="e.g., 3"

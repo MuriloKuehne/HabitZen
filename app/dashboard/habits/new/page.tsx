@@ -21,8 +21,8 @@ export default function NewHabitPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8 max-w-2xl">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 animate-in fade-in duration-500">New Habit</h1>
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8 max-w-2xl">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8 animate-in fade-in duration-500">New Habit</h1>
       <HabitForm onSubmit={handleSubmit} />
     </div>
   );

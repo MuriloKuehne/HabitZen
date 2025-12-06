@@ -1,0 +1,60 @@
+{
+  "name": "HabitZen - Gamified Habit Tracker",
+  "short_name": "HabitZen",
+  "description": "Track your daily and weekly habits with XP and leveling system. Build better habits, earn XP, and level up your life.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-pwa.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle", "health"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your habits and progress",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icon-pwa.png",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "New Habit",
+      "short_name": "New Habit",
+      "description": "Create a new habit",
+      "url": "/dashboard/habits/new",
+      "icons": [
+        {
+          "src": "/icon-pwa.png",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Statistics",
+      "short_name": "Stats",
+      "description": "View your statistics",
+      "url": "/dashboard/stats",
+      "icons": [
+        {
+          "src": "/icon-pwa.png",
+          "sizes": "any"
+        }
+      ]
+    }
+  ]
+}
+

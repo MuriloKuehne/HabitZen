@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { ServiceWorkerRegistration } from "./components/ServiceWorkerRegistration";
 import "./globals.css";
 
 const roboto = Roboto({ 
@@ -18,6 +19,16 @@ export const metadata: Metadata = {
   keywords: ["habit tracker", "gamification", "productivity", "habits", "XP", "leveling"],
   authors: [{ name: "HabitZen" }],
   creator: "HabitZen",
+  manifest: "/manifest.json",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "HabitZen",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -30,6 +41,24 @@ export const metadata: Metadata = {
     title: "HabitZen - Gamified Habit Tracker",
     description: "Track your daily and weekly habits with XP and leveling system",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-pwa.png", sizes: "any", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-pwa.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: [
+      { url: "/icon-pwa.png", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -40,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={roboto.className}>
+        <ServiceWorkerRegistration />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
