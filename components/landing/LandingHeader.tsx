@@ -48,6 +48,7 @@ export function LandingHeader() {
           ? "bg-background/95 backdrop-blur-sm border-border/50 shadow-sm"
           : "bg-background/80 backdrop-blur-sm border-transparent"
       }`}
+      style={{ paddingTop: 'max(0px, env(safe-area-inset-top))' }}
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
@@ -85,9 +86,14 @@ export function LandingHeader() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setMobileMenuOpen(true)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(true);
+              }}
               aria-label="Open menu"
               className="h-11 w-11 touch-manipulation"
+              type="button"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -104,6 +110,7 @@ export function LandingHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => {
+                  e.stopPropagation();
                   handleSmoothScroll(e, link.href);
                   setMobileMenuOpen(false);
                 }}

@@ -48,6 +48,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>
@@ -66,13 +67,23 @@ export function SheetContent({
   ...props
 }: SheetContentProps) {
   return (
-    <div className={cn("flex flex-col h-full", className)} {...props}>
+    <div 
+      className={cn("flex flex-col h-full", className)} 
+      {...props}
+      onClick={(e) => e.stopPropagation()}
+      style={{ paddingTop: 'max(0px, env(safe-area-inset-top))' }}
+    >
       <div className="flex items-center justify-between p-4 sm:p-6 border-b shrink-0">
         <h2 className="text-lg font-semibold">Menu</h2>
         <button
-          onClick={onClose}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onClose();
+          }}
           className="rounded-md p-2 hover:bg-accent transition-colors touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Close menu"
+          type="button"
         >
           <X className="h-5 w-5" />
         </button>

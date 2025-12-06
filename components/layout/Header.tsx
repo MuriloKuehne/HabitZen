@@ -36,7 +36,7 @@ export function Header() {
   ];
 
   return (
-    <header className="border-b bg-background sticky top-0 z-30 backdrop-blur-sm bg-background/95">
+    <header className="border-b bg-background sticky top-0 z-30 backdrop-blur-sm bg-background/95" style={{ paddingTop: 'max(0px, env(safe-area-inset-top))' }}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
@@ -84,8 +84,13 @@ export function Header() {
               size="icon"
               variant="ghost"
               className="md:hidden h-11 w-11 transition-all duration-200 hover:scale-105 touch-manipulation"
-              onClick={() => setMobileMenuOpen(true)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen(true);
+              }}
               aria-label="Open menu"
+              type="button"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -102,7 +107,10 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMobileMenuOpen(false);
+                  }}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium transition-all duration-200 touch-manipulation min-h-[44px] ${
                     link.active
                       ? "bg-accent text-accent-foreground border border-border"
@@ -116,7 +124,10 @@ export function Header() {
             })}
             <Link
               href="/dashboard/habits/new"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileMenuOpen(false);
+              }}
               className="flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium transition-all duration-200 hover:bg-accent active:bg-accent/80 mt-2 touch-manipulation min-h-[44px] text-foreground"
             >
               <Plus className="h-5 w-5 shrink-0" />
@@ -127,8 +138,13 @@ export function Header() {
               <ThemeToggle />
             </div>
             <button
-              onClick={handleSignOut}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSignOut();
+                setMobileMenuOpen(false);
+              }}
               className="flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium transition-all duration-200 hover:bg-accent active:bg-accent/80 mt-2 text-left touch-manipulation min-h-[44px] w-full text-foreground"
+              type="button"
             >
               <LogOut className="h-5 w-5 shrink-0" />
               Sign Out
