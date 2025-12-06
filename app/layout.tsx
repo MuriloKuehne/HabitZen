@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { ServiceWorkerRegistration } from "./components/ServiceWorkerRegistration";
@@ -20,10 +20,6 @@ export const metadata: Metadata = {
   authors: [{ name: "HabitZen" }],
   creator: "HabitZen",
   manifest: "/manifest.json",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
-  ],
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -41,13 +37,6 @@ export const metadata: Metadata = {
     title: "HabitZen - Gamified Habit Tracker",
     description: "Track your daily and weekly habits with XP and leveling system",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: "cover",
-  },
   icons: {
     icon: [
       { url: "/icon-pwa.png", sizes: "any", type: "image/png" },
@@ -59,6 +48,18 @@ export const metadata: Metadata = {
       { url: "/icon-pwa.png", type: "image/png" },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
 };
 
 export default function RootLayout({
